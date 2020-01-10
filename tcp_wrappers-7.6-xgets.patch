@@ -1,0 +1,47 @@
+--- tcp_wrappers_7.6/misc.c.fix-xgets-infinite-loop	2012-04-22 07:51:40.000000000 +0900
++++ tcp_wrappers_7.6/misc.c	2012-04-22 07:59:38.000000000 +0900
+@@ -32,20 +32,32 @@
+ {
+     int     got;
+     char   *start = ptr;
++    int     c, last;
+ 
+     while (fgets(ptr, len, fp)) {
+ 	got = strlen(ptr);
+-	if (got >= 1 && ptr[got - 1] == '\n') {
+-	    tcpd_context.line++;
+-	    if (got >= 2 && ptr[got - 2] == '\\') {
+-		got -= 2;
+-	    } else {
+-		return (start);
+-	    }
+-	}
+-	ptr += got;
+-	len -= got;
+-	ptr[0] = 0;
++        if (got >= 1 && ptr[got - 1] == '\n') {
++            tcpd_context.line++;
++            if (got >= 2 && ptr[got - 2] == '\\') {
++                got -= 2;
++            } else {
++                return (start);
++            }
++            ptr += got;
++            len -= got;
++            ptr[0] = 0;
++        } else {
++            /* over buffer len */
++            last = (got >= 1) ? ptr[got - 1] : '\0';
++            while ((c = fgetc(fp)) != EOF) {
++                if (c == '\n') {
++                    tcpd_context.line++;
++                    if (last != '\\')
++                        return (start);
++                }
++                last = c;
++            }
++        }
+     }
+     return (ptr > start ? start : 0);
+ }
+

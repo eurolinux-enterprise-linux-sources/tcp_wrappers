@@ -1,7 +1,7 @@
 Summary: A security tool which acts as a wrapper for TCP daemons
 Name: tcp_wrappers
 Version: 7.6
-Release: 57%{?dist}
+Release: 58%{?dist}
 
 %define LIB_MAJOR 0
 %define LIB_MINOR 7
@@ -35,6 +35,10 @@ Patch20: tcp_wrappers-7.6-sigchld.patch
 Patch21: tcp_wrappers-7.6-196326.patch
 Patch22: tcp_wrappers_7.6-249430.patch
 Patch23: tcp_wrappers-7.6-relro.patch
+# Do not eat 100% CPU for long lines (#731350)
+Patch24: tcp_wrappers-7.6-xgets.patch
+# Restore tcpdmatch functionality (#1084458)
+Patch25: tcp_wrappers-7.6-inetdconf.patch
 # required by sin_scope_id in ipv6 patch
 BuildRequires: glibc-devel >= 2.2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -92,6 +96,8 @@ develop applications with tcp_wrappers support.
 %patch21 -p1 -b .196326
 %patch22 -p1 -b .249430
 %patch23 -p1 -b .relro
+%patch24 -p1 -b .xgets
+%patch25 -p1 -b .intedconf
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fPIC -DPIC -D_REENTRANT -DHAVE_STRERROR" LDFLAGS="-pie" MAJOR=%{LIB_MAJOR} MINOR=%{LIB_MINOR} REL=%{LIB_REL} linux
@@ -116,11 +122,10 @@ install -p -m644 tcpd.h ${RPM_BUILD_ROOT}%{_includedir}
 install -m755 safe_finger ${RPM_BUILD_ROOT}%{_sbindir}
 install -m755 tcpd ${RPM_BUILD_ROOT}%{_sbindir}
 install -m755 try-from ${RPM_BUILD_ROOT}%{_sbindir}
+install -m755 tcpdmatch ${RPM_BUILD_ROOT}%{_sbindir}
 
 # XXX remove utilities that expect /etc/inetd.conf (#16059).
 #install -m755 tcpdchk ${RPM_BUILD_ROOT}%{_sbindir}
-#install -m755 tcpdmatch ${RPM_BUILD_ROOT}%{_sbindir}
-rm -f ${RPM_BUILD_ROOT}%{_mandir}/man8/tcpdmatch.*
 rm -f ${RPM_BUILD_ROOT}%{_mandir}/man8/tcpdchk.*
 
 %post libs -p /sbin/ldconfig
@@ -150,6 +155,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_mandir}/man3/*
 
 %changelog
+* Tue Dec 01 2015 Jakub Jelen <jjelen@redhat.com> 7.6-58
+- Add modified tcpdmatch (#1084458)
+- Repair possible DOS in xgets for long lines (#731350)
+
 * Wed Aug 10 2010 Jan F.Chadima <jchadima@redhat.com> - 7.6-57
 - Add partial relro for libraries (#727287)
 
