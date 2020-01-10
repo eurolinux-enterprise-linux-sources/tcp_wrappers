@@ -1,7 +1,7 @@
 Summary: A security tool which acts as a wrapper for TCP daemons
 Name: tcp_wrappers
 Version: 7.6
-Release: 56.3%{?dist}
+Release: 57%{?dist}
 
 %define LIB_MAJOR 0
 %define LIB_MINOR 7
@@ -34,6 +34,7 @@ Patch19: tcp_wrappers-7.6-siglongjmp.patch
 Patch20: tcp_wrappers-7.6-sigchld.patch
 Patch21: tcp_wrappers-7.6-196326.patch
 Patch22: tcp_wrappers_7.6-249430.patch
+Patch23: tcp_wrappers-7.6-relro.patch
 # required by sin_scope_id in ipv6 patch
 BuildRequires: glibc-devel >= 2.2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -90,6 +91,7 @@ develop applications with tcp_wrappers support.
 %patch20 -p1 -b .sigchld
 %patch21 -p1 -b .196326
 %patch22 -p1 -b .249430
+%patch23 -p1 -b .relro
 
 %build
 make RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fPIC -DPIC -D_REENTRANT -DHAVE_STRERROR" LDFLAGS="-pie" MAJOR=%{LIB_MAJOR} MINOR=%{LIB_MINOR} REL=%{LIB_REL} linux
@@ -148,6 +150,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_mandir}/man3/*
 
 %changelog
+* Wed Aug 10 2010 Jan F.Chadima <jchadima@redhat.com> - 7.6-57
+- Add partial relro for libraries (#727287)
+
 * Fri Feb  5 2010 Jan F. Chadima <jchadima@redhat.com> - 7.6-56.3
 - Add manual pages for safe_finger and try-from (#522102)
 
