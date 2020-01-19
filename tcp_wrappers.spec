@@ -1,7 +1,7 @@
 Summary: A security tool which acts as a wrapper for TCP daemons
 Name: tcp_wrappers
 Version: 7.6
-Release: 77%{?dist}
+Release: 75%{?dist}
 
 %define LIB_MAJOR 0
 %define LIB_MINOR 7
@@ -157,12 +157,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_mandir}/man3/*
 
 %changelog
-* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 7.6-77
-- Mass rebuild 2014-01-24
-
-* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 7.6-76
-- Mass rebuild 2013-12-27
-
 * Fri Aug 16 2013 Petr Lautrbach <plautrba@redhat.com> 7.6-75
 - cleanup several warnings and fix compiler inet_ntop issue (#977995)
 
